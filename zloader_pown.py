@@ -84,7 +84,7 @@ def manage_type_1(sheet, dump):
 
 def manage_type_2(sheet, dump):
     urls = []
-    for i in range(-255, 255, +1):
+    for i in range(-500, 500, +1):
         lines = []
         shifter_found = False
         for j in range(sheet.ncols):
