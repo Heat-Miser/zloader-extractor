@@ -82,7 +82,7 @@ def manage_type_1(sheet, dump):
 
 def manage_type_2(sheet, dump):
     urls = []
-    for i in range(-250, 255, +1):
+    for i in range(-255, 255, +1):
         lines = []
         shifter_found = False
         for j in range(sheet.ncols):
@@ -144,7 +144,7 @@ if __name__ == '__main__':
             exit(1)
     if ARGS.d:
         urls = []
-        for root,d_names,f_names in os.walk(ARGS.d):
+        for root, d_names, f_names in os.walk(ARGS.d):
             for f in f_names:
                 file = os.path.join(root, f)
                 if check_sample(file):
