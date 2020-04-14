@@ -41,7 +41,7 @@ def check_type(sheet):
         return list(types)[0]
     return 'z'
 
-def manage_type_1(sheet):
+def manage_type_1(sheet, dump):
     urls = []
     values = {}
     lines = []
@@ -64,24 +64,35 @@ def manage_type_1(sheet):
         maxval = ""
     for line in lines:
         line = line.replace(maxval, "")
+        if dump:
+            print(line)
         urls += re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', line)
     return urls
 
 
-def manage_type_2(sheet):
+def manage_type_2(sheet, dump):
     urls = []
     for i in range(-250, 255, +1):
+        lines = []
+        shifter_found = False
         for j in range(sheet.ncols):
             res = ""
             for line in sheet.col(j):
                 if line.ctype == 2:
                     if line.value != "" and line.value - i >= 32 and line.value -i <= 126:
                         res += chr(int(line.value) - i)
-            urls += re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', res)
+            lines.append(res)
+            urls_tmp = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', res)
+            urls += urls_tmp
+            if urls_tmp:
+                shifter_found = True
+        if shifter_found and dump:
+            for line in lines:
+                print(line)
     return urls
 
 
-def extract_macros(filename):
+def extract_macros(filename, dump):
 
     print("Extracting macros from %s" % filename)
     try:
@@ -94,9 +105,9 @@ def extract_macros(filename):
         if sheet.visibility == 2:
             typ = check_type(sheet)
             if typ == 1:
-                return manage_type_1(sheet)
+                return manage_type_1(sheet, dump)
             elif typ == 2:
-                return manage_type_2(sheet)
+                return manage_type_2(sheet, dump)
             else:
                 print("ERROR: unsupported file format")
                 return []
@@ -106,12 +117,13 @@ if __name__ == '__main__':
     PARSER = argparse.ArgumentParser(description='Tries to urls from zloader xls droppers')
     PARSER.add_argument('-d', nargs='?', help="directory containing xls droppers")
     PARSER.add_argument('-f', nargs='?', help="xls dropper")
+    PARSER.add_argument('--dump-macro', dest='dump', action='store_true', help="print full decoded macros")
     ARGS = PARSER.parse_args()
     if not ARGS.d and not ARGS.f:
         PARSER.error("Please provide at least one file or directory")
     if ARGS.f:
         if check_sample(ARGS.f):
-            results = extract_macros(ARGS.f)
+            results = extract_macros(ARGS.f, ARGS.dump)
             if results:
                 print("Payload delivery urls found:")
                 for url in results:
@@ -126,7 +138,7 @@ if __name__ == '__main__':
             for f in f_names:
                 file = os.path.join(root, f)
                 if check_sample(file):
-                    urls += extract_macros(file)
+                    urls += extract_macros(file, ARGS.dump)
         print("Payload delivery urls found:")
         urls = list(dict.fromkeys(urls))
         for url in urls:
