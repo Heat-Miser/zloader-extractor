@@ -83,14 +83,12 @@ def manage_type_1(sheet, dump):
 
 
 def calc_average_value(sheet):
+    vals = []
     for j in range(sheet.ncols):
-        res = 0
-        counter = 0
         for line in sheet.col(j):
             if line.ctype == 2:
-                res += int(line.value)
-                counter += 1
-    return int(res / counter)
+                vals.append(int(line.value))
+    return int(sum(vals) / len(vals))
 
 
 def manage_type_2(sheet, dump):
