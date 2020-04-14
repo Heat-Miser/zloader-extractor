@@ -82,9 +82,21 @@ def manage_type_1(sheet, dump):
     return urls
 
 
+def calc_average_value(sheet):
+    for j in range(sheet.ncols):
+        res = 0
+        counter = 0
+        for line in sheet.col(j):
+            if line.ctype == 2:
+                res += int(line.value)
+                counter += 1
+    return int(res / counter)
+
+
 def manage_type_2(sheet, dump):
     urls = []
-    for i in range(-500, 500, +1):
+    average = calc_average_value(sheet)
+    for i in range(-average, average, +1):
         lines = []
         shifter_found = False
         for j in range(sheet.ncols):
@@ -101,6 +113,8 @@ def manage_type_2(sheet, dump):
         if shifter_found and dump:
             for line in lines:
                 print(line)
+        if shifter_found:
+            return urls
     return urls
 
 
