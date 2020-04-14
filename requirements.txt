@@ -1,0 +1,2 @@
+git+https://github.com/Heat-Miser/xlrd@master
+
