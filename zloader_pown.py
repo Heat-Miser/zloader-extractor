@@ -103,7 +103,8 @@ def manage_type_2(sheet, dump):
                 if line.ctype == 2:
                     if line.value != "" and line.value - i >= 32 and line.value -i <= 126:
                         res += chr(int(line.value) - i)
-            lines.append(res)
+            if res:
+                lines.append(res)
             urls_tmp = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', res)
             urls += urls_tmp
             if urls_tmp:
