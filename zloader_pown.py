@@ -24,6 +24,16 @@ rule Zloader
 }
 """
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 def check_sample(filename):
     with open(filename, "rb") as f:
         binary_content = f.read()
@@ -94,11 +104,11 @@ def manage_type_2(sheet, dump):
 
 def extract_macros(filename, dump):
 
-    print("Extracting macros from %s" % filename)
+    print(f"{bcolors.HEADER}## Extracting macros from {filename}{bcolors.ENDC}")
     try:
         wb = xlrd.open_workbook(filename)
     except:
-        print("ERROR: not a valid xls file")
+        print(f"{bcolors.FAIL}!! ERROR: not a valid xls file{bcolors.ENDC}")
         return []
 
     for sheet in wb.sheets():
@@ -109,7 +119,7 @@ def extract_macros(filename, dump):
             elif typ == 2:
                 return manage_type_2(sheet, dump)
             else:
-                print("ERROR: unsupported file format")
+                print(f"{bcolors.FAIL}!! ERROR: unsupported file format{bcolors.ENDC}")
                 return []
 
 
@@ -120,17 +130,17 @@ if __name__ == '__main__':
     PARSER.add_argument('--dump-macro', dest='dump', action='store_true', help="print full decoded macros")
     ARGS = PARSER.parse_args()
     if not ARGS.d and not ARGS.f:
-        PARSER.error("Please provide at least one file or directory")
+        PARSER.error(f"{bcolors.FAIL}Please provide at least one file or directory{bcolors.ENDC}")
     if ARGS.f:
         if check_sample(ARGS.f):
             results = extract_macros(ARGS.f, ARGS.dump)
             if results:
-                print("Payload delivery urls found:")
+                print(f"{bcolors.HEADER}## Payload delivery urls found:{bcolors.ENDC}")
                 for url in results:
                     print(url)
             exit(0)
         else:
-            print("ERROR: not a Zloader sample")
+            print(f"{bcolors.FAIL}!! ERROR: not a Zloader sample{bcolors.ENDC}")
             exit(1)
     if ARGS.d:
         urls = []
@@ -139,7 +149,7 @@ if __name__ == '__main__':
                 file = os.path.join(root, f)
                 if check_sample(file):
                     urls += extract_macros(file, ARGS.dump)
-        print("Payload delivery urls found:")
+        print(f"{bcolors.HEADER}Payload delivery urls found:{bcolors.ENDC}")
         urls = list(dict.fromkeys(urls))
         for url in urls:
             print(url)
