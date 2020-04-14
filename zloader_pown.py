@@ -43,14 +43,16 @@ def check_sample(filename):
 
 def check_type(sheet):
     c = sheet.col(0)
-    types = set()
+    types2 = {}
     for line in c:
         if line.ctype != 0:
-            types.add(line.ctype)
-    if len(types) > 0:
-        return list(types)[0]
-    return 'z'
-
+            if line.ctype not in types2.keys():
+                types2[line.ctype] = 1
+            else:
+                types2[line.ctype] += 1
+    maxval = max(types2.items(), key=operator.itemgetter(1))[0]
+    return maxval
+#
 def manage_type_1(sheet, dump):
     urls = []
     values = {}
