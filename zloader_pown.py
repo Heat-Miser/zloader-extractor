@@ -1,4 +1,4 @@
-from xlrd import xlrd
+import xlrd
 import argparse
 import operator
 import re

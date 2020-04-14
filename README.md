@@ -5,7 +5,7 @@ A script to extract network IOCs from Zloader xls droppers
 #### Requirements
 
 ```
-pip install -r requirements.txt
+$>pip install -r requirements.txt
 ```
 
 
@@ -14,11 +14,11 @@ pip install -r requirements.txt
 One one file:
 
 ```
-python3 zloader_pown.py -f <xls file>
+$>python3 zloader_pown.py -f <xls file>
 ```
 
 Recursively on a directory (every file will be matched agasint the embedded yara rule):
 
 ```
-python3 zloader_pown.py -d <path to the directory>
+$>python3 zloader_pown.py -d <path to the directory>
 ```
