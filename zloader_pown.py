@@ -34,6 +34,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+
 def check_sample(filename):
     with open(filename, "rb") as f:
         binary_content = f.read()
@@ -41,18 +42,39 @@ def check_sample(filename):
         matches = my_rule.match(data=binary_content)
     return matches
 
-def check_type(sheet):
-    c = sheet.col(0)
-    types2 = {}
-    for line in c:
-        if line.ctype != 0:
-            if line.ctype not in types2.keys():
-                types2[line.ctype] = 1
+
+def spot_junk(sheet):
+    values = {}
+    for j in range(sheet.ncols):
+        for line in sheet.col(j):
+            if line.value not in values.keys():
+                values[line.value] = 1
             else:
-                types2[line.ctype] += 1
+                values[line.value] += 1
+
+    size = sheet.ncols * sheet.nrows
+    results = []
+    for value, quantity in values.items():
+        if quantity > size / 4:
+            results.append(value)
+    return results
+
+
+def check_type(sheet):
+    types2 = {}
+    junk = spot_junk(sheet)
+    for j in range(sheet.ncols):
+        c = sheet.col(j)
+        for line in c:
+            if line.ctype != 0 and line.value not in junk:
+                if line.ctype not in types2.keys():
+                    types2[line.ctype] = 1
+                else:
+                    types2[line.ctype] += 1
     maxval = max(types2.items(), key=operator.itemgetter(1))[0]
     return maxval
-#
+
+
 def manage_type_1(sheet, dump):
     urls = []
     values = {}
@@ -87,8 +109,8 @@ def calc_average_value(sheet):
     for j in range(sheet.ncols):
         for line in sheet.col(j):
             if line.ctype == 2:
-                vals.append(int(line.value))
-    return int(sum(vals) / len(vals))
+                vals.append(abs(int(line.value)))
+    return 2 * max(vals)
 
 
 def manage_type_2(sheet, dump):
